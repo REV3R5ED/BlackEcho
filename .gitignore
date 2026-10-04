@@ -6,3 +6,4 @@ normalized/
 correlation/*.json
 reports/
 .pytest_cache/
+scoring/

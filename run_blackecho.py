@@ -16,21 +16,28 @@ from pathlib import Path
 
 STAGES = [
     ("evidence", [sys.executable, "evidence_factory.py"]),
-    ("runners", [sys.executable, "-c", (
-        "from pathlib import Path;"
-        "from runners.phishscope import PhishScopeRunner;"
-        "from runners.metatrace import MetaTraceRunner;"
-        "from runners.huntforge import HuntForgeRunner;"
-        "from runners.loglens import LogLensRunner;"
-        "from runners.netscope import NetScopeRunner;"
-        "from runners.sentinelkit import SentinelKitRunner;"
-        "from runners.aegisforge import AegisForgeRunner;"
-        "from runners.autoops import AutoOPRunner;"
-        "ev=Path('evidence');"
-        "[c().run(ev) for c in (PhishScopeRunner,MetaTraceRunner,HuntForgeRunner,"
-        "LogLensRunner,NetScopeRunner,SentinelKitRunner,AegisForgeRunner,AutoOPRunner)];"
-        "print('all runners complete')"
-    )]),
+    (
+        "runners",
+        [
+            sys.executable,
+            "-c",
+            (
+                "from pathlib import Path;"
+                "from runners.phishscope import PhishScopeRunner;"
+                "from runners.metatrace import MetaTraceRunner;"
+                "from runners.huntforge import HuntForgeRunner;"
+                "from runners.loglens import LogLensRunner;"
+                "from runners.netscope import NetScopeRunner;"
+                "from runners.sentinelkit import SentinelKitRunner;"
+                "from runners.aegisforge import AegisForgeRunner;"
+                "from runners.autoops import AutoOPRunner;"
+                "ev=Path('evidence');"
+                "[c().run(ev) for c in (PhishScopeRunner,MetaTraceRunner,HuntForgeRunner,"
+                "LogLensRunner,NetScopeRunner,SentinelKitRunner,AegisForgeRunner,AutoOPRunner)];"
+                "print('all runners complete')"
+            ),
+        ],
+    ),
     ("normalize", [sys.executable, "normalize.py"]),
     ("correlate", [sys.executable, "correlate.py"]),
     ("score", [sys.executable, "score.py"]),
@@ -54,7 +61,7 @@ def main() -> None:
             print("--- skip evidence (reuse existing) ---")
             continue
         print(f"--- stage: {name} ---")
-        proc = subprocess.run(argv, cwd=Path.cwd())
+        proc = subprocess.run(argv, cwd=Path.cwd(), check=False)
         if proc.returncode != 0:
             print(f"stage {name} failed (exit {proc.returncode})", file=sys.stderr)
             sys.exit(1)

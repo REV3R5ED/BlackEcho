@@ -50,6 +50,7 @@ class BaseRunner(ABC):
 
     def run(self, evidence: Path, outdir: Path | None = None) -> list[RunResult]:
         import os
+
         outdir = outdir or (OUTPUT_ROOT / self.tool)
         outdir.mkdir(parents=True, exist_ok=True)
         # Ensure tool CLIs are findable (venv bin + PATH override).
@@ -59,29 +60,38 @@ class BaseRunner(ABC):
         results = []
         for i, argv in enumerate(self.build_argv(evidence)):
             start = time.monotonic()
-            proc = subprocess.run(argv, capture_output=True, text=True,
-                                  timeout=300, env=env)
+            proc = subprocess.run(argv, capture_output=True, text=True, timeout=300, env=env, check=False)
             runtime_ms = int((time.monotonic() - start) * 1000)
             try:
                 native = self.parse_native(proc.stdout, argv)
             except Exception as exc:  # noqa: BLE001 — record parse failures
                 native = {"_parse_error": str(exc)}
             result = RunResult(
-                tool=self.tool, argv=argv, exit_code=proc.returncode,
-                runtime_ms=runtime_ms, stdout=proc.stdout,
-                stderr=proc.stderr, native=native,
+                tool=self.tool,
+                argv=argv,
+                exit_code=proc.returncode,
+                runtime_ms=runtime_ms,
+                stdout=proc.stdout,
+                stderr=proc.stderr,
+                native=native,
             )
             # Persist
             tag = f"{i:02d}"
             (outdir / f"{tag}-argv.json").write_text(json.dumps(argv, indent=2))
             (outdir / f"{tag}-stdout.txt").write_text(proc.stdout)
             (outdir / f"{tag}-stderr.txt").write_text(proc.stderr)
-            (outdir / f"{tag}-meta.json").write_text(json.dumps({
-                "tool": self.tool, "version": self.version,
-                "exit_code": proc.returncode, "runtime_ms": runtime_ms,
-            }, indent=2))
-            (outdir / f"{tag}-native.json").write_text(
-                json.dumps(native, indent=2, default=str))
+            (outdir / f"{tag}-meta.json").write_text(
+                json.dumps(
+                    {
+                        "tool": self.tool,
+                        "version": self.version,
+                        "exit_code": proc.returncode,
+                        "runtime_ms": runtime_ms,
+                    },
+                    indent=2,
+                )
+            )
+            (outdir / f"{tag}-native.json").write_text(json.dumps(native, indent=2, default=str))
             results.append(result)
         return results
 

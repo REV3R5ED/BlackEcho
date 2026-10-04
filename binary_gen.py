@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """BlackEcho binary evidence generators (stdlib only, deterministic).
 
 build_jpeg_with_exif: minimal JPEG with an EXIF APP1 segment carrying
@@ -11,10 +12,10 @@ from __future__ import annotations
 import random
 import struct
 
-
 # ---------------------------------------------------------------------------
 # JPEG + EXIF
 # ---------------------------------------------------------------------------
+
 
 def _tiff_entry(tag: int, typ: int, count: int, value: bytes) -> bytes:
     """One 12-byte IFD entry. value is packed inline if <=4 bytes."""
@@ -32,9 +33,9 @@ def build_jpeg_with_exif(rng: random.Random) -> bytes:
     software = b"NM Invoice Scanner 3.1\x00"
     # String table placed after the IFD
     strings = [
-        (0x010F, make),      # Make
-        (0x0110, model),     # Model
-        (0x0132, dt),        # DateTime
+        (0x010F, make),  # Make
+        (0x0110, model),  # Model
+        (0x0132, dt),  # DateTime
         (0x0131, software),  # Software
         (0x8298, b"Northstar Meridian - synthetic evidence\x00"),  # Copyright
     ]
@@ -77,6 +78,7 @@ def build_jpeg_with_exif(rng: random.Random) -> bytes:
 # PCAP with DNS queries
 # ---------------------------------------------------------------------------
 
+
 def _dns_query_packet(query: str, qtype: int = 1) -> bytes:
     """Ethernet + IPv4 + UDP + DNS query packet."""
     # DNS
@@ -94,9 +96,9 @@ def _dns_query_packet(query: str, qtype: int = 1) -> bytes:
 
     # IPv4 (10.20.30.44 -> 10.20.30.10)
     ip_len = 20 + udp_len
-    ip = struct.pack(">BBHHHBBHII",
-                     0x45, 0, ip_len, 0x1234, 0x4000, 64, 17, 0,
-                     0x0A141E2C, 0x0A141E0A)  # 10.20.30.44 -> 10.20.30.10
+    ip = struct.pack(
+        ">BBHHHBBHII", 0x45, 0, ip_len, 0x1234, 0x4000, 64, 17, 0, 0x0A141E2C, 0x0A141E0A
+    )  # 10.20.30.44 -> 10.20.30.10
 
     # Ethernet (dummy MACs)
     eth = b"\x00" * 12 + b"\x08\x00"
