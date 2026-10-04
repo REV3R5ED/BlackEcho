@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+evidence/
+runners/output/
+normalized/
+correlation/*.json
+reports/
+.pytest_cache/

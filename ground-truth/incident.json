@@ -1,1 +1,49 @@
-{"_comment":"AUTHORITATIVE GROUND TRUTH — tools must never read this during analysis. Scoring only.","affected_host":"WS-FINANCE-04","affected_identity":"finance.user","attack_ids":["T1566","T1059.001","T1547.001"],"benign_distractors":[{"label":"legitimate vendor thread","type":"email"},{"label":"admin PowerShell session","type":"process"},{"label":"software update check","type":"network"},{"label":"browser traffic to benign sites","type":"network"}],"incident_id":"BLACKECHO-001","initial_access":"phishing email","persistence":{"key":"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\SysHostUpdate","technique":"T1547.001","type":"Registry Run key","value":"C:\\Users\\finance.user\\AppData\\Local\\Temp\\svc-host-update.exe"},"process_chain":["WINWORD.EXE","powershell.exe","svc-host-update.exe"],"scenario_time_base":"2026-09-28T08:12:00Z"}
+{
+  "_comment": "AUTHORITATIVE GROUND TRUTH \u2014 tools must never read this during analysis. Scoring only.",
+  "affected_host": "WS-FINANCE-04",
+  "affected_identity": "finance.user",
+  "attack_ids": [
+    "T1566",
+    "T1059.001",
+    "T1547.001"
+  ],
+  "benign_distractors": [
+    {
+      "label": "legitimate vendor thread",
+      "type": "email"
+    },
+    {
+      "label": "admin PowerShell session",
+      "type": "process"
+    },
+    {
+      "label": "software update check",
+      "type": "network"
+    },
+    {
+      "label": "browser traffic to benign sites",
+      "type": "network"
+    }
+  ],
+  "incident_id": "BLACKECHO-001",
+  "initial_access": "phishing email",
+  "persistence": {
+    "key": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\SysHostUpdate",
+    "technique": "T1547.001",
+    "type": "Registry Run key",
+    "value": "C:\\Users\\finance.user\\AppData\\Local\\Temp\\svc-host-update.exe"
+  },
+  "process_chain": [
+    "WINWORD.EXE",
+    "powershell.exe",
+    "svc-host-update.exe"
+  ],
+  "scenario_time_base": "2026-09-28T08:12:00Z",
+  "indicators": {
+    "domain": "invoice-portal-updates.example",
+    "ip": "203.0.113.44",
+    "payload_sha256": "5f81db367a54becda8fed723f23224fb77cacb9170fe850c32505902df76dab4",
+    "payload_filename": "svc-host-update.exe",
+    "note": "documentation-range / controlled test values only"
+  }
+}
