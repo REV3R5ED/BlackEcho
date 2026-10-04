@@ -26,6 +26,14 @@ ground-truth scoring.
 
 Pinned tool commits: [`manifests/tool-versions.json`](manifests/tool-versions.json)
 
+## The report
+
+Every run produces a Markdown and HTML analyst report. The HTML version:
+
+![BlackEcho investigation report](docs/screenshots/01-report.png)
+
+![BlackEcho timeline](docs/screenshots/02-timeline.png)
+
 ## How it works
 
 ```

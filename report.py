@@ -9,8 +9,18 @@ Usage: python3 report.py
 
 from __future__ import annotations
 
+import html as _html
 import json
+import re
 from pathlib import Path
+
+
+def _inline_md(text: str) -> str:
+    """Render inline markdown (bold, code) as HTML. Escapes everything else."""
+    text = _html.escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"`([^`]+?)`", r"<code>\1</code>", text)
+    return text
 
 GT = json.loads(Path("ground-truth/incident.json").read_text())
 SCORE = json.loads(Path("scoring/results.json").read_text())
@@ -135,11 +145,26 @@ def main() -> None:
         "<body>",
     ]
     in_table = False
+    in_pre = False
     for ln in lines:
-        if ln.startswith("| ") and ln.endswith("|"):
+        if ln.startswith("```"):
+            if in_pre:
+                html.append("</pre>")
+                in_pre = False
+            else:
+                if in_table:
+                    html.append("</table>")
+                    in_table = False
+                html.append("<pre>")
+                in_pre = True
+            continue
+        if in_pre:
+            html.append(_html.escape(ln))
+            continue
+        if ln.startswith("|") and ln.endswith("|"):
             cells = [c.strip() for c in ln.strip("|").split("|")]
-            if set(cells) <= {"-", "---", "------------"}:
-                continue
+            if cells and all(set(c) <= {"-", " "} for c in cells):
+                continue  # markdown table separator row
             if not in_table:
                 html.append("<table>")
                 in_table = True
@@ -151,23 +176,23 @@ def main() -> None:
                 else "td"
             )
             # First row after <table> is the header
-            html.append("<tr>" + "".join(f"<{tag}>{c}</{tag}>" for c in cells) + "</tr>")
+            html.append("<tr>" + "".join(f"<{tag}>{_inline_md(c)}</{tag}>" for c in cells) + "</tr>")
         else:
             if in_table:
                 html.append("</table>")
                 in_table = False
             if ln.startswith("# "):
-                html.append(f"<h1>{ln[2:]}</h1>")
+                html.append(f"<h1>{_inline_md(ln[2:])}</h1>")
             elif ln.startswith("## "):
-                html.append(f"<h2>{ln[3:]}</h2>")
+                html.append(f"<h2>{_inline_md(ln[3:])}</h2>")
             elif ln.startswith("### "):
-                html.append(f"<h3>{ln[4:]}</h3>")
+                html.append(f"<h3>{_inline_md(ln[4:])}</h3>")
             elif ln.startswith("- "):
-                html.append(f"<ul><li>{ln[2:]}</li></ul>")
-            elif ln.startswith("```"):
-                html.append("<pre>" if html and not html[-1].startswith("<pre>") else "</pre>")
+                html.append(f"<ul><li>{_inline_md(ln[2:])}</li></ul>")
             elif ln.strip():
-                html.append(f"<p>{ln}</p>")
+                html.append(f"<p>{_inline_md(ln)}</p>")
+    if in_pre:
+        html.append("</pre>")
     if in_table:
         html.append("</table>")
     html += ["</body>", "</html>"]
