@@ -27,4 +27,9 @@ class HuntForgeRunner(BaseRunner):
     def parse_native(self, stdout: str, argv: list[str]) -> dict:
         import json
         d = json.loads(stdout)
-        return d.get("data", d)
+        # Preserve top-level findings/events alongside data
+        out = dict(d.get("data", {}))
+        for key in ("findings", "events", "status", "summary"):
+            if key in d:
+                out[key] = d[key]
+        return out
