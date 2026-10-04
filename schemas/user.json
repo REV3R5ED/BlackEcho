@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","allOf":[{"$ref":"envelope.json"}],"properties":{"domain":{"type":["string","null"]},"email":{"type":["string","null"]},"username":{"type":"string"}},"required":["username"],"title":"BlackEcho User","type":"object"}
